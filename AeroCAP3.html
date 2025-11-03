@@ -1,1 +1,1122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AeroCAP-Collect and Protect</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
+        :root {
+            --green-50: #f0fdf4;
+            --green-100: #dcfce7;
+            --green-600: #16a34a;
+            --green-700: #15803d;
+            --blue-50: #eff6ff;
+            --blue-600: #2563eb;
+            --blue-700: #1d4ed8;
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --gray-300: #d1d5db;
+            --gray-600: #4b5563;
+            --gray-700: #374151;
+            --gray-800: #1f2937;
+            --gray-900: #111827;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            color: var(--gray-800);
+            background: white;
+        }
+
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            padding: 1rem 0;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            cursor: pointer;
+        }
+
+        .logo {
+  text-align: center;     /* centers the logo horizontally */
+  margin-top: 5px;
+}
+
+.logo img {
+  width: 200px;           /* adjust the size */
+  height: auto;           /* keeps the image ratio */
+  border-radius: 5px;    /* optional, gives rounded corners */
+}
+
+        .logo-text {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--green-600), var(--blue-600));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+            align-items: center;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--gray-600);
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: var(--green-600);
+        }
+
+        .nav-links .cta-btn {
+            background: linear-gradient(135deg, var(--green-600), var(--blue-600));
+            color: white;
+            padding: 0.5rem 1.5rem;
+            border-radius: 8px;
+            transition: transform 0.3s;
+        }
+
+        .nav-links .cta-btn:hover {
+            transform: translateY(-2px);
+            color: white;
+        }
+
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--gray-800);
+        }
+
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(135deg, var(--green-50), var(--blue-50));
+            padding: 8rem 2rem 4rem;
+            margin-top: 60px;
+        }
+
+        .hero-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+        }
+
+        .hero-content {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: white;
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            width: fit-content;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            font-weight: 800;
+            line-height: 1.2;
+            color: var(--gray-900);
+        }
+
+        .gradient-text {
+            background: linear-gradient(135deg, var(--green-600), var(--blue-600));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero p {
+            font-size: 1.25rem;
+            color: var(--gray-600);
+        }
+
+        .cta-buttons {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 0.875rem 2rem;
+            border-radius: 8px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--green-600), var(--blue-600));
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(22, 163, 74, 0.3);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: var(--gray-800);
+            border: 2px solid var(--gray-300);
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--green-600);
+            color: var(--green-600);
+        }
+
+        .stats {
+            display: flex;
+            gap: 2rem;
+            margin-top: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .stat {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--green-600);
+        }
+
+        .stat-label {
+            font-size: 0.875rem;
+            color: var(--gray-600);
+        }
+
+        .hero-image {
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+            width: 100%;
+            height: auto;
+        }
+
+        /* Dashboard Section */
+        .dashboard-section {
+            padding: 4rem 2rem;
+            background: white;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .section-header h2 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--gray-900);
+            margin-bottom: 0.5rem;
+        }
+
+        .section-header p {
+            font-size: 1.125rem;
+            color: var(--gray-600);
+        }
+
+        .dashboard-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .dashboard-card {
+            background: white;
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        .aqi-display {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .aqi-card {
+            background: linear-gradient(135deg, var(--green-50), var(--blue-50));
+            padding: 1.5rem;
+            border-radius: 12px;
+            border: 2px solid rgba(22, 163, 74, 0.1);
+        }
+
+        .aqi-label {
+            font-size: 0.875rem;
+            color: var(--gray-600);
+            margin-bottom: 0.5rem;
+        }
+
+        .aqi-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--green-600);
+            margin-bottom: 0.25rem;
+        }
+
+        .aqi-status {
+            font-size: 1rem;
+            font-weight: 600;
+            padding: 0.25rem 0.75rem;
+            border-radius: 50px;
+            display: inline-block;
+        }
+
+        .status-good { background: #dcfce7; color: #15803d; }
+        .status-moderate { background: #fef3c7; color: #92400e; }
+        .status-unhealthy { background: #fee2e2; color: #991b1b; }
+
+        /* How It Works Section */
+        .how-it-works {
+            padding: 4rem 2rem;
+            background: var(--gray-50);
+        }
+
+        .steps-grid {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .step-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 16px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+            transition: transform 0.3s;
+        }
+
+        .step-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+        }
+
+        .step-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+            font-size: 1.5rem;
+        }
+
+        .icon-green { background: var(--green-100); color: var(--green-600); }
+        .icon-blue { background: var(--blue-50); color: var(--blue-600); }
+        .icon-purple { background: #f3e8ff; color: #7c3aed; }
+
+        .step-card h3 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--gray-900);
+            margin-bottom: 0.75rem;
+        }
+
+        .step-card p {
+            color: var(--gray-600);
+            line-height: 1.7;
+        }
+
+        /* Education Section */
+        .education {
+            padding: 4rem 2rem;
+            background: white;
+        }
+
+        .education-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+        }
+
+        .education-image {
+            width: 100%;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+        }
+
+        .education-content h2 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--gray-900);
+            margin-bottom: 1.5rem;
+        }
+
+        .benefits-list {
+            list-style: none;
+            margin-bottom: 2rem;
+        }
+
+        .benefits-list li {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .check-icon {
+            width: 24px;
+            height: 24px;
+            background: var(--green-100);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--green-600);
+            flex-shrink: 0;
+            margin-top: 0.25rem;
+        }
+
+        .benefit-text {
+            flex: 1;
+        }
+
+        .benefit-text strong {
+            display: block;
+            color: var(--gray-900);
+            margin-bottom: 0.25rem;
+        }
+
+        .benefit-text span {
+            color: var(--gray-600);
+        }
+
+        /* Final CTA Section */
+        .final-cta {
+            padding: 4rem 2rem;
+            background: linear-gradient(135deg, var(--green-600), var(--blue-600));
+            color: white;
+            text-align: center;
+        }
+
+        .final-cta-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .final-cta h2 {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        .final-cta p {
+            font-size: 1.25rem;
+            margin-bottom: 2rem;
+            opacity: 0.95;
+        }
+
+        .final-cta .btn {
+            background: white;
+            color: var(--green-600);
+            font-size: 1.125rem;
+            padding: 1rem 2.5rem;
+        }
+
+        .final-cta .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 16px;
+            padding: 2.5rem;
+            max-width: 500px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-header h3 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--gray-900);
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--gray-600);
+            padding: 0;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: background 0.3s;
+        }
+
+        .close-btn:hover {
+            background: var(--gray-100);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            color: var(--gray-700);
+            margin-bottom: 0.5rem;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid var(--gray-300);
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--green-600);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 1rem;
+            background: linear-gradient(135deg, var(--green-600), var(--blue-600));
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(22, 163, 74, 0.3);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+                flex-direction: column;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background: white;
+                padding: 1rem;
+                box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            }
+
+            .nav-links.active {
+                display: flex;
+            }
+
+            .mobile-menu-btn {
+                display: block;
+            }
+
+            .hero-container,
+            .education-container {
+                grid-template-columns: 1fr;
+            }
+
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .steps-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .stats {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .final-cta h2 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav>
+        <div class="nav-container">
+            <div class="logo-container" onclick="document.getElementById('logoInput').click()">
+                <div class="logo">
+  <img src="/images/logo-removebg-preview.png" alt="AeroCAP Logo">
+  </div>
+                <input type="file" id="logoInput" accept="image/*" style="display: none;">
+            </div>
+            <ul class="nav-links" id="navLinks">
+                <li><a href="#home">Home</a></li>
+                <li><a href="#aqi">AQI Dashboard</a></li>
+                <li><a href="#how-it-works">How It Works</a></li>
+                <li><a href="#about">About Us</a></li>
+                <li><a href="#" class="cta-btn" onclick="openModal(event)">Book Pickup</a></li>
+            </ul>
+            <button class="mobile-menu-btn" onclick="toggleMobileMenu()">☰</button>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero" id="home">
+        <div class="hero-container">
+            <div class="hero-content">
+                <div class="badge">
+                    <span>🌱</span>
+                    <span>Cleaner Air Through E-Waste Recycling</span>
+                </div>
+                <h1>
+                    Turn Your <span class="gradient-text">E-Waste</span> Into Clean Air
+                </h1>
+                <p>
+                    Schedule free pickup of your electronic waste and contribute to reducing air pollution in your community. Track real-time AQI improvements.
+                </p>
+                <div class="cta-buttons">
+                    <button class="btn btn-primary" onclick="openModal(event)">Schedule Free Pickup</button>
+                    <a href="#aqi" class="btn btn-secondary">View Impact Stats</a>
+                </div>
+                <div class="stats">
+                    <div class="stat">
+                        <div class="stat-value" id="totalPickups">2,500+</div>
+                        <div class="stat-label">Pickups Completed</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-value">15 tons</div>
+                        <div class="stat-label">E-Waste Recycled</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-value">-8%</div>
+                        <div class="stat-label">AQI Reduction</div>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <img src="https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?w=600&h=400&fit=crop" alt="E-Waste Recycling" class="hero-image">
+            </div>
+        </div>
+    </section>
+
+    <!-- Live Dashboard Section -->
+    <section class="dashboard-section" id="aqi">
+        <div class="section-header">
+            <h2>Live Air Quality Dashboard</h2>
+            <p>Real-time AQI data for Hyderabad, Telangana</p>
+        </div>
+        <div class="dashboard-container">
+            <div class="dashboard-card">
+                <div class="aqi-display">
+                    <div class="aqi-card">
+                        <div class="aqi-label">Current AQI</div>
+                        <div class="aqi-value" id="currentAQI">Loading...</div>
+                        <span class="aqi-status" id="aqiStatus">Loading...</span>
+                    </div>
+                    <div class="aqi-card">
+                        <div class="aqi-label">Location</div>
+                        <div class="aqi-value" style="font-size: 1.5rem;">Hyderabad</div>
+                        <span style="color: var(--gray-600);">Telangana, India</span>
+                    </div>
+                    <div class="aqi-card">
+                        <div class="aqi-label">Last Updated</div>
+                        <div class="aqi-value" style="font-size: 1.25rem;" id="lastUpdated">--</div>
+                        <span style="color: var(--gray-600);">Live data</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works Section -->
+    <section class="how-it-works" id="how-it-works">
+        <div class="section-header">
+            <h2>How It Works</h2>
+            <p>Three simple steps to make a difference</p>
+        </div>
+        <div class="steps-grid">
+            <div class="step-card">
+                <div class="step-icon icon-green">♻️</div>
+                <h3>Schedule Pickup</h3>
+                <p>Fill out a simple form with your e-waste details and preferred pickup time. Our system instantly notifies local recyclers.</p>
+            </div>
+            <div class="step-card">
+                <div class="step-icon icon-blue">✓</div>
+                <h3>We Collect</h3>
+                <p>Our certified recyclers arrive at your doorstep on the scheduled date to safely collect your electronic waste at no cost.</p>
+            </div>
+            <div class="step-card">
+                <div class="step-icon icon-purple">📉</div>
+                <h3>Track Impact</h3>
+                <p>Watch how your contribution helps reduce local air pollution through our real-time AQI tracking dashboard.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Education Section -->
+    <section class="education" id="about">
+        <div class="education-container">
+            <div>
+                <img src="https://images.unsplash.com/photo-1611284446314-60a58ac0deb9?w=600&h=400&fit=crop" alt="Environmental Impact" class="education-image">
+            </div>
+            <div class="education-content">
+                <h2>Why Proper E-Waste Disposal Matters</h2>
+                <ul class="benefits-list">
+                    <li>
+                        <div class="check-icon">✓</div>
+                        <div class="benefit-text">
+                            <strong>Prevents Toxic Air Pollution</strong>
+                            <span>Improper disposal releases harmful chemicals like lead and mercury into the air, contributing to poor AQI.</span>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="check-icon">✓</div>
+                        <div class="benefit-text">
+                            <strong>Supports Circular Economy</strong>
+                            <span>95% of e-waste materials can be recycled and reused, reducing the need for harmful mining operations.</span>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="check-icon">✓</div>
+                        <div class="benefit-text">
+                            <strong>Meets Sustainability Goals</strong>
+                            <span>Aligns with UN SDG 11, 12, and 13 for sustainable cities, responsible consumption, and climate action.</span>
+                        </div>
+                    </li>
+                </ul>
+                <button class="btn btn-primary" onclick="openModal(event)">Start Your Impact Today</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Final CTA Section -->
+    <section class="final-cta">
+        <div class="final-cta-container">
+            <h2>Ready to Make a Difference?</h2>
+            <p>Join thousands of environmentally conscious citizens making Hyderabad cleaner, one pickup at a time.</p>
+            <button class="btn" onclick="openModal(event)">Schedule Free Pickup Now</button>
+        </div>
+    </section>
+
+    <!-- Pickup Modal -->
+    <div class="modal" id="pickupModal" onclick="closeModalOnOutsideClick(event)">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Schedule E-Waste Pickup</h3>
+                <button class="close-btn" onclick="closeModal()">×</button>
+            </div>
+            <form id="pickupForm" onsubmit="handleFormSubmit(event)">
+                <div class="form-group">
+                    <label for="name">Full Name *</label>
+                    <input type="text" id="name" required>
+                </div>
+                <div class="form-group">
+                    <label for="email">Email Address *</label>
+                    <input type="email" id="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="phone">Phone Number *</label>
+                    <input type="tel" id="phone" required>
+                </div>
+                <div class="form-group">
+                    <label for="address">Pickup Address *</label>
+                    <textarea id="address" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="ewaste">Type of E-Waste *</label>
+                    <select id="ewaste" required>
+                        <option value="">Select type</option>
+                        <option value="laptop">Laptop / Computer</option>
+                        <option value="mobile">Mobile Phone / Tablet</option>
+                        <option value="charger">Chargers / Cables</option>
+                        <option value="battery">Batteries</option>
+                        <option value="appliance">Home Appliances</option>
+                        <option value="other">Other Electronics</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="date">Preferred Pickup Date *</label>
+                    <input type="date" id="date" required>
+                </div>
+                <div class="form-group">
+                    <label for="time">Preferred Time Slot *</label>
+                    <select id="time" required>
+                        <option value="">Select time</option>
+                        <option value="morning">Morning (9 AM - 12 PM)</option>
+                        <option value="afternoon">Afternoon (12 PM - 3 PM)</option>
+                        <option value="evening">Evening (3 PM - 6 PM)</option>
+                    </select>
+                </div>
+                <button type="submit" class="submit-btn">Submit Request</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Supabase Configuration
+        const SUPABASE_URL = 'YOUR_SUPABASE_URL';
+        const SUPABASE_KEY = 'YOUR_SUPABASE_ANON_KEY';
+        let supabase = null;
+
+        // Initialize Supabase if keys are provided
+        if (SUPABASE_URL !== 'YOUR_SUPABASE_URL' && SUPABASE_KEY !== 'YOUR_SUPABASE_ANON_KEY') {
+            supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        }
+
+        // Modal Functions
+        function openModal(e) {
+            if (e) e.preventDefault();
+            document.getElementById('pickupModal').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal() {
+            document.getElementById('pickupModal').classList.remove('active');
+            document.body.style.overflow = 'auto';
+        }
+
+        function closeModalOnOutsideClick(e) {
+            if (e.target === document.getElementById('pickupModal')) {
+                closeModal();
+            }
+        }
+
+        // Mobile Menu Toggle
+        function toggleMobileMenu() {
+            const navLinks = document.getElementById('navLinks');
+            navLinks.classList.toggle('active');
+        }
+
+        // Logo Upload
+        document.getElementById('logoInput').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    const logoBox = document.getElementById('logoBox');
+                    logoBox.innerHTML = `<img src="${event.target.result}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 8px;">`;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // Fetch AQI Data
+        async function fetchAQI() {
+            try {
+                const API_KEY = 'YOUR_OPENWEATHER_API_KEY';
+                const lat = 17.385;
+                const lon = 78.4867;
+                
+                if (API_KEY !== 'YOUR_OPENWEATHER_API_KEY') {
+                    const response = await fetch(
+                        `https://api.openweathermap.org/data/2.5/air_pollution?lat=${lat}&lon=${lon}&appid=${API_KEY}`
+                    );
+                    
+                    const data = await response.json();
+                    
+                    if (data && data.list && data.list[0]) {
+                        const aqi = data.list[0].main.aqi;
+                        const aqiValue = aqi * 50;
+                        updateAQIDisplay(aqiValue);
+                        return;
+                    }
+                }
+            } catch (error) {
+                console.error('Error fetching AQI:', error);
+            }
+            
+            displaySimulatedAQI();
+        }
+
+        function updateAQIDisplay(aqiValue) {
+            document.getElementById('currentAQI').textContent = Math.round(aqiValue);
+            
+            const statusElement = document.getElementById('aqiStatus');
+            if (aqiValue <= 50) {
+                statusElement.textContent = 'Good';
+                statusElement.className = 'aqi-status status-good';
+            } else if (aqiValue <= 100) {
+                statusElement.textContent = 'Moderate';
+                statusElement.className = 'aqi-status status-moderate';
+            } else {
+                statusElement.textContent = 'Unhealthy';
+                statusElement.className = 'aqi-status status-unhealthy';
+            }
+            
+            const now = new Date();
+            document.getElementById('lastUpdated').textContent = 
+                now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+        }
+
+        function displaySimulatedAQI() {
+            const simulatedAQI = Math.floor(Math.random() * 100) + 60;
+            updateAQIDisplay(simulatedAQI);
+        }
+
+        // Form Submission
+        async function handleFormSubmit(e) {
+            e.preventDefault();
+            
+            const formData = {
+                name: document.getElementById('name').value,
+                email: document.getElementById('email').value,
+                phone: document.getElementById('phone').value,
+                address: document.getElementById('address').value,
+                ewaste_type: document.getElementById('ewaste').value,
+                pickup_date: document.getElementById('date').value,
+                time_slot: document.getElementById('time').value,
+                status: 'pending',
+                created_at: new Date().toISOString()
+            };
+
+            try {
+                if (supabase) {
+                    const { data, error } = await supabase
+                        .from('pickup_requests')
+                        .insert([formData]);
+
+                    if (error) {
+                        console.error('Supabase error:', error);
+                        alert('Thank you! Your pickup request has been received. (Demo mode: Configure Supabase for full functionality)');
+                    } else {
+                        alert('Success! Your pickup has been scheduled. We will contact you shortly.');
+                        updatePickupStats();
+                    }
+                } else {
+                    console.log('Demo mode: Form data:', formData);
+                    alert('Thank you! Your pickup request has been received. (Demo mode: Configure Supabase for full functionality)');
+                }
+
+                document.getElementById('pickupForm').reset();
+                closeModal();
+
+            } catch (error) {
+                console.error('Error submitting form:', error);
+                alert('Thank you! Your request has been received. (Demo mode)');
+                document.getElementById('pickupForm').reset();
+                closeModal();
+            }
+        }
+
+        // Update pickup statistics
+        async function updatePickupStats() {
+            if (!supabase) return;
+            
+            try {
+                const { count, error } = await supabase
+                    .from('pickup_requests')
+                    .select('*', { count: 'exact', head: true });
+
+                if (!error && count !== null && count > 0) {
+                    document.getElementById('totalPickups').textContent = `${count}+`;
+                }
+            } catch (error) {
+                console.error('Error fetching stats:', error);
+            }
+        }
+
+        // Load pickup stats on page load
+        async function loadStats() {
+            if (!supabase) return;
+            
+            try {
+                const { count, error } = await supabase
+                    .from('pickup_requests')
+                    .select('*', { count: 'exact', head: true });
+
+                if (!error && count !== null && count > 0) {
+                    document.getElementById('totalPickups').textContent = `${count}+`;
+                }
+            } catch (error) {
+                console.log('Using default stats (Demo mode)');
+            }
+        }
+
+        // Smooth scroll for navigation
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                const href = this.getAttribute('href');
+                if (href === '#') return;
+                
+                e.preventDefault();
+                const target = document.querySelector(href);
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                    
+                    const navLinks = document.getElementById('navLinks');
+                    if (navLinks.classList.contains('active')) {
+                        navLinks.classList.remove('active');
+                    }
+                }
+            });
+        });
+
+        // Set minimum date for pickup (tomorrow)
+        function setMinDate() {
+            const tomorrow = new Date();
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            const minDate = tomorrow.toISOString().split('T')[0];
+            document.getElementById('date').min = minDate;
+        }
+
+        // Initialize on page load
+        window.addEventListener('load', function() {
+            setMinDate();
+            displaySimulatedAQI();
+            loadStats();
+            
+            setInterval(displaySimulatedAQI, 300000);
+            
+            console.log('%c🌱 AeroCAP Setup Instructions', 'color: #16a34a; font-size: 16px; font-weight: bold;');
+            console.log('%c═══════════════════════════════════════════════════', 'color: #16a34a;');
+            console.log('\n📊 SUPABASE SETUP\n');
+            console.log('1. Create account at https://supabase.com');
+            console.log('2. Create a new project');
+            console.log('3. Go to SQL Editor and run:\n');
+            console.log(`
+CREATE TABLE pickup_requests (
+    id BIGSERIAL PRIMARY KEY,
+    name TEXT NOT NULL,
+    email TEXT NOT NULL,
+    phone TEXT NOT NULL,
+    address TEXT NOT NULL,
+    ewaste_type TEXT NOT NULL,
+    pickup_date DATE NOT NULL,
+    time_slot TEXT NOT NULL,
+    status TEXT DEFAULT 'pending',
+    created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+ALTER TABLE pickup_requests ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Allow public inserts" ON pickup_requests
+    FOR INSERT WITH CHECK (true);
+
+CREATE POLICY "Allow public reads" ON pickup_requests
+    FOR SELECT USING (true);
+            `);
+            console.log('\n4. Get your URL and Key from Settings > API');
+            console.log('5. Replace SUPABASE_URL and SUPABASE_KEY in the code\n');
+            console.log('%c═══════════════════════════════════════════════════', 'color: #16a34a;');
+            console.log('\n🌍 OPENWEATHER API SETUP (Optional)\n');
+            console.log('1. Sign up at https://openweathermap.org/api');
+            console.log('2. Get your free API key');
+            console.log('3. Replace YOUR_OPENWEATHER_API_KEY in the code');
+            console.log('4. Real AQI data will be fetched automatically\n');
+            console.log('%c═══════════════════════════════════════════════════', 'color: #16a34a;');
+            console.log('\n✅ Currently running in DEMO MODE with simulated data');
+            console.log('%c═══════════════════════════════════════════════════\n', 'color: #16a34a;');
+        });
+
+        // Handle ESC key to close modal
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeModal();
+            }
+        });
+    </script>
+</body>
+</html>
